@@ -31,8 +31,11 @@ program linearsolve
     integer, dimension(2) :: p_size
     
     RSRC = 0; CSRC = 0
-    Mstart = 400; Nstart = 400
+    Mstart = 256; Nstart = 256
     total = 5
+    ! Block sizes
+    MB = 32
+    NB = 32
 
     ! Initialize an NPROW x NPCOL process grid using a row-major
     ! ordering  of  the  processes. This routine retrieves a default system
@@ -66,9 +69,10 @@ program linearsolve
         endif
 
         ! Rows, cols per proc
-        MXLOCR = M / MB
-        MXLOCC = N / NB 
+        MXLOCR = M / NPROW
+        MXLOCC = N / NPCOL
         MXLLDA = MAX(MXLOCR, MXLOCC)
+        
         ! Allocate arrays
         allocate(A( MXLLDA, MXLOCC ), A0( MXLLDA, MXLOCC ))
         allocate(B( MXLLDA, 1 ), B0( MXLLDA, 1 ))
