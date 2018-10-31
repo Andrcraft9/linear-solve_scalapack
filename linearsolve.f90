@@ -32,11 +32,11 @@ program linearsolve
     integer, dimension(2) :: p_size
     
     RSRC = 0; CSRC = 0
-    Mstart = 256; Nstart = 256
+    Mstart = 16; Nstart = 16
     total = 5
     ! Block sizes
-    MB = 32
-    NB = 32
+    MB = 4
+    NB = 4
 
     ! Initialize an NPROW x NPCOL process grid using a row-major
     ! ordering  of  the  processes. This routine retrieves a default system
@@ -84,14 +84,15 @@ program linearsolve
         allocate(B( MXLLDB, 1 ), B0( MXLLDB, 1 ))
         allocate(IPIV( MXLOCR + NB ), WORK( MXLOCR ))
 
-        if (IAM == 0) then
-            print *, "MXLLDA, MXLLDB, MXLOCC = ", MXLLDA, MXLLDB, MXLOCC
-        endif
+        !if (IAM == 0) then
+        print *, IAM, "MXLLDA, MXLLDB, MXLOCC, MXLOCR = ", MXLLDA, MXLLDB, MXLOCC, MXLOCR
+        print *, IAM, "MB, NB, MYROW, MYCOL", MB, NB, MYROW, MYCOL
+        !endif
         ! Initialize the array descriptors for the matrices A
         call DESCINIT( DESCA, M, N, MB, NB, RSRC, CSRC, ICTXT, MXLLDA, INFO )
-        call DESCINIT( DESCB, N, 1, NB, 1, RSRC, CSRC, ICTXT, MXLLDB, INFO )
+        call DESCINIT( DESCB, N, 1, MB, NB, RSRC, CSRC, ICTXT, MXLLDB, INFO )
 
-        do i = 1, MXLLDA
+        do i = 1, MXLLDB
             B(i, :) = 1.0d0
         enddo
 
