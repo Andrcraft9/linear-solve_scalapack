@@ -73,8 +73,8 @@ program linearsolve
         MXLOCR = M / NPROW
         MXLOCC = N / NPCOL
         !MXLLDA = MAX(MXLOCR, MXLOCC)
-        MXLLDA = MAX(1, NUMROC(DESCA( M_ ), DESCA( MB_ ), MYROW, DESCA( RSRC_ ), NPROW))
-        MXLLDB = MAX(1, NUMROC(DESCB( M_ ), DESCB( MB_ ), MYROW, DESCB( RSRC_ ), NPROW))
+        MXLLDA = MAX(1, NUMROC(M, MB, MYROW, RSRC, NPROW))
+        MXLLDB = MAX(1, NUMROC(N, NB, MYROW, RSRC, NPROW))
         
         ! Allocate arrays
         !allocate(A( MXLLDA, MXLOCC ), A0( MXLLDA, MXLOCC ))
