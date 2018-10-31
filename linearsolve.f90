@@ -25,6 +25,7 @@ program linearsolve
     double precision :: ANORM, BNORM, EPS, RESID, XNORM
     
     double precision :: PDLAMCH, PDLANGE ! Functions
+    integer :: NUMROC ! Functions
 
     real*8 :: stime, etime
     integer :: i, k, total, ierr
