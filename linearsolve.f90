@@ -10,7 +10,7 @@ program linearsolve
     
     integer :: M, N, Mstart, Nstart
     integer :: MB, NB
-    integer :: MXLLDA, MXLOCC, MXLOCR
+    integer :: MXLLDA, MXLLDB, MXLOCC, MXLOCR
     integer :: RSRC, CSRC
     
     double precision, allocatable :: A(:, :), A0(:, :)
@@ -58,7 +58,7 @@ program linearsolve
     endif
     ! Define process grid
     call BLACS_GET( -1, 0, ICTXT )
-    call BLACS_GRIDINIT( ICTXT, 'Row-major', NPROW, NPCOL )
+    call BLACS_GRIDINIT( ICTXT, 'R', NPROW, NPCOL )
     call BLACS_GRIDINFO( ICTXT, NPROW, NPCOL, MYROW, MYCOL )
 
     do k = 1, total
@@ -71,19 +71,24 @@ program linearsolve
         ! Rows, cols per proc
         MXLOCR = M / NPROW
         MXLOCC = N / NPCOL
-        MXLLDA = MAX(MXLOCR, MXLOCC)
+        !MXLLDA = MAX(MXLOCR, MXLOCC)
+        MXLLDA = MAX(1, NUMROC(DESCA( M_ ), DESCA( MB_ ), MYROW, DESCA( RSRC_ ), NPROW))
+        MXLLDB = MAX(1, NUMROC(DESCB( M_ ), DESCB( MB_ ), MYROW, DESCB( RSRC_ ), NPROW))
         
         ! Allocate arrays
+        !allocate(A( MXLLDA, MXLOCC ), A0( MXLLDA, MXLOCC ))
+        !allocate(B( MXLLDA, 1 ), B0( MXLLDA, 1 ))
+        !allocate(IPIV( MXLOCR + NB ), WORK( MXLOCR ))
         allocate(A( MXLLDA, MXLOCC ), A0( MXLLDA, MXLOCC ))
-        allocate(B( MXLLDA, 1 ), B0( MXLLDA, 1 ))
+        allocate(B( MXLLDB, 1 ), B0( MXLLDB, 1 ))
         allocate(IPIV( MXLOCR + NB ), WORK( MXLOCR ))
 
         if (IAM == 0) then
-            print *, "MXLLDA, MXLOCC, MXLLDA = ", MXLLDA, MXLOCR, MXLLDA
+            print *, "MXLLDA, MXLLDB, MXLOCC = ", MXLLDA, MXLLDB, MXLOCC
         endif
         ! Initialize the array descriptors for the matrices A
         call DESCINIT( DESCA, M, N, MB, NB, RSRC, CSRC, ICTXT, MXLLDA, INFO )
-        call DESCINIT( DESCB, N, 1, NB, 1, RSRC, CSRC, ICTXT, MXLLDA, INFO )
+        call DESCINIT( DESCB, N, 1, NB, 1, RSRC, CSRC, ICTXT, MXLLDB, INFO )
 
         do i = 1, MXLLDA
             B(i, :) = 1.0d0
@@ -100,20 +105,20 @@ program linearsolve
                     DESCA( LLD_ ), DESCA( RSRC_ ),        &
                     DESCA( CSRC_ ), IASEED, 0, MXLOCR, 0, MXLOCC, &
                     MYROW, MYCOL, NPROW, NPCOL )
-        !if (IAM == 0) print *, "GENERATED"
+        if (IAM == 0) print *, "GENERATED"
 
         ! Make a copy of A and B for checking purposes
         !call PDLACPY( 'All', N, N, A, 1, 1, DESCA, A0, 1, 1, DESCA )
         !call PDLACPY( 'All', N, 1, B, 1, 1, DESCB, B0, 1, 1, DESCB )
         A0 = A
         B0 = B
-        !if (IAM == 0) print *, "COPIED"
+        if (IAM == 0) print *, "COPIED"
         
         ! Linear solve
         stime = mpi_wtime()
         call PDGESV( N, 1, A, 1, 1, DESCA, IPIV, B, 1, 1, DESCB, INFO )
         etime = mpi_wtime()
-        !if (IAM == 0) print *, "SOLVED"
+        if (IAM == 0) print *, "SOLVED"
 
         ! Resudial computational
         !EPS = PDLAMCH( ICTXT, 'Epsilon' )
