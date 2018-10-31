@@ -103,8 +103,10 @@ program linearsolve
         !if (IAM == 0) print *, "GENERATED"
 
         ! Make a copy of A and B for checking purposes
-        call PDLACPY( 'All', N, N, A, 1, 1, DESCA, A0, 1, 1, DESCA )
-        call PDLACPY( 'All', N, 1, B, 1, 1, DESCB, B0, 1, 1, DESCB )
+        !call PDLACPY( 'All', N, N, A, 1, 1, DESCA, A0, 1, 1, DESCA )
+        !call PDLACPY( 'All', N, 1, B, 1, 1, DESCB, B0, 1, 1, DESCB )
+        A0 = A
+        B0 = B
         !if (IAM == 0) print *, "COPIED"
         
         ! Linear solve
