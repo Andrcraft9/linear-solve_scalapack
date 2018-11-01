@@ -32,11 +32,11 @@ program linearsolve
     integer, dimension(2) :: p_size
     
     RSRC = 0; CSRC = 0
-    Mstart = 16; Nstart = 16
-    total = 5
+    Mstart = 128; Nstart = 128
+    total = 4
     ! Block sizes
-    MB = 4
-    NB = 4
+    MB = 32
+    NB = 32
 
     ! Initialize an NPROW x NPCOL process grid using a row-major
     ! ordering  of  the  processes. This routine retrieves a default system
@@ -123,13 +123,9 @@ program linearsolve
         if (IAM == 0) print *, "SOLVED"
 
         ! Resudial computational
-        !EPS = PDLAMCH( ICTXT, 'Epsilon' )
-        !ANORM = PDLANGE( 'I', N, N, A, 1, 1, DESCA, WORK )
-        !BNORM = PDLANGE( 'I', N, 1, B, 1, 1, DESCB, WORK )
         call PDGEMM( 'N', 'N', N, 1, N, 1.0d0, A0, 1, 1, DESCA, B, 1, 1,   &
                     DESCB, -1.0d0, B0, 1, 1, DESCB )
         XNORM = PDLANGE( 'I', N, 1, B0, 1, 1, DESCB, WORK )
-        !RESID = XNORM / ( ANORM*BNORM*EPS*DBLE( N ) )
         RESID = XNORM
 
         if (IAM == 0) then
