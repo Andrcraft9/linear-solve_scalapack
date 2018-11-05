@@ -1,0 +1,10 @@
+# this file was automaticly created by mpisubmit.pl script #
+module add ScaLAPACK/netlib-2.0.2_repo OpenMPI/1.10.7_repo
+#BSUB -n 4 
+#BSUB -W 00:15
+#BSUB -i task.in
+#BSUB -o task.%J.out
+#BSUB -e task.%J.err
+#BSUB -env all
+export LD_LIBRARY_PATH=/opt/ibm/lib:/opt/ibm/xlsmp/4.1.6/lib:/opt/ibmmath/essl/6.1/lib64:/opt/ibmmath/pessl/5.3/lib64:${LD_LIBRARY_PATH}
+OMP_NUM_THREADS=1 mpiexec -n 4 ./prog

@@ -32,7 +32,7 @@ program linearsolve
     integer, dimension(2) :: p_size
     
     RSRC = 0; CSRC = 0
-    Mstart = 128; Nstart = 128
+    Mstart = 256; Nstart = 256
     total = 4
     ! Block sizes
     MB = 32
@@ -85,8 +85,8 @@ program linearsolve
         allocate(IPIV( MXLOCR + NB ), WORK( MXLOCR ))
 
         !if (IAM == 0) then
-        print *, IAM, "MXLLDA, MXLLDB, MXLOCC, MXLOCR = ", MXLLDA, MXLLDB, MXLOCC, MXLOCR
-        print *, IAM, "MB, NB, MYROW, MYCOL", MB, NB, MYROW, MYCOL
+        !print *, IAM, "MXLLDA, MXLLDB, MXLOCC, MXLOCR = ", MXLLDA, MXLLDB, MXLOCC, MXLOCR
+        !print *, IAM, "MB, NB, MYROW, MYCOL", MB, NB, MYROW, MYCOL
         !endif
         ! Initialize the array descriptors for the matrices A
         call DESCINIT( DESCA, M, N, MB, NB, RSRC, CSRC, ICTXT, MXLLDA, INFO )
@@ -107,20 +107,20 @@ program linearsolve
                     DESCA( LLD_ ), DESCA( RSRC_ ),        &
                     DESCA( CSRC_ ), IASEED, 0, MXLOCR, 0, MXLOCC, &
                     MYROW, MYCOL, NPROW, NPCOL )
-        if (IAM == 0) print *, "GENERATED"
+        !if (IAM == 0) print *, "GENERATED"
 
         ! Make a copy of A and B for checking purposes
         !call PDLACPY( 'All', N, N, A, 1, 1, DESCA, A0, 1, 1, DESCA )
         !call PDLACPY( 'All', N, 1, B, 1, 1, DESCB, B0, 1, 1, DESCB )
         A0 = A
         B0 = B
-        if (IAM == 0) print *, "COPIED"
+        !if (IAM == 0) print *, "COPIED"
         
         ! Linear solve
         stime = mpi_wtime()
         call PDGESV( N, 1, A, 1, 1, DESCA, IPIV, B, 1, 1, DESCB, INFO )
         etime = mpi_wtime()
-        if (IAM == 0) print *, "SOLVED"
+        !if (IAM == 0) print *, "SOLVED"
 
         ! Resudial computational
         call PDGEMM( 'N', 'N', N, 1, N, 1.0d0, A0, 1, 1, DESCA, B, 1, 1,   &
