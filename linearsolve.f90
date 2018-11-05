@@ -32,7 +32,7 @@ program linearsolve
     integer, dimension(2) :: p_size
     
     RSRC = 0; CSRC = 0
-    Mstart = 256; Nstart = 256
+    Mstart = 4096; Nstart = 4096
     total = 4
     ! Block sizes
     MB = 32
